@@ -1938,9 +1938,10 @@ namespace GMap.NET.WindowsForms
 
         protected override void OnMouseDoubleClick(MouseEventArgs e)
         {
-            base.OnMouseClick(e);
+         //base.OnMouseClick(e);
+         base.OnMouseDoubleClick(e); //Fix OnMouseDoubleClick bug #172
 
-            if (!Core.IsDragging)
+         if (!Core.IsDragging)
             {
                 for (int i = Overlays.Count - 1; i >= 0; i--)
                 {

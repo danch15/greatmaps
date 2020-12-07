@@ -51,15 +51,22 @@ namespace Demo.WindowsPresentation
          //
 
          // set cache mode only if no internet avaible
-         if(!Stuff.PingNetwork("pingtest.com"))
+         if (!Stuff.PingNetwork("pingtest.com"))
          {
             MainMap.Manager.Mode = AccessMode.CacheOnly;
             MessageBox.Show("No internet connection available, going to CacheOnly mode.", "GMap.NET - Demo.WindowsPresentation", MessageBoxButton.OK, MessageBoxImage.Warning);
          }
 
          // config map
-         MainMap.MapProvider = GMapProviders.OpenStreetMap;
-         MainMap.Position = new PointLatLng(54.6961334816182, 25.2985095977783);
+         //MainMap.MapProvider = GMapProviders.OpenStreetMap;
+         //MainMap.Position = new PointLatLng(54.6961334816182, 25.2985095977783);
+
+         //MainMap.MapProvider = BaiduMapProvider.Instance;
+         //MainMap.Position = new PointLatLng(39.915119, 116.403963); //天安门
+         //MainMap.MaxZoom = BaiduMapProvider.Instance.MaxZoom.Value;// GMapProviders.BaiduMap.MaxZoom.Value; 
+         //MainMap.MinZoom = BaiduMapProvider.Instance.MinZoom;// GMapProviders.BaiduMap.MinZoom;
+         //MainMap.Zoom = 15;
+         MainMap.MapProvider = GoogleChinaMapProvider.Instance;
 
          //MainMap.ScaleMode = ScaleModes.Dynamic;
 
@@ -120,7 +127,7 @@ namespace Demo.WindowsPresentation
             GeoCoderStatusCode status = GeoCoderStatusCode.Unknow;
 
             PointLatLng? city = GMapProviders.GoogleMap.GetPoint("Lithuania, Vilnius", out status);
-            if(city != null && status == GeoCoderStatusCode.G_GEO_SUCCESS)
+            if (city != null && status == GeoCoderStatusCode.G_GEO_SUCCESS)
             {
                GMapMarker it = new GMapMarker(city.Value);
                {
@@ -136,7 +143,7 @@ namespace Demo.WindowsPresentation
                   {
                      string area = "Antakalnis";
                      PointLatLng? pos = GMapProviders.GoogleMap.GetPoint("Lithuania, Vilnius, " + area, out status);
-                     if(pos != null && status == GeoCoderStatusCode.G_GEO_SUCCESS)
+                     if (pos != null && status == GeoCoderStatusCode.G_GEO_SUCCESS)
                      {
                         objects.Add(new PointAndInfo(pos.Value, area));
                      }
@@ -144,7 +151,7 @@ namespace Demo.WindowsPresentation
                   {
                      string area = "Senamiestis";
                      PointLatLng? pos = GMapProviders.GoogleMap.GetPoint("Lithuania, Vilnius, " + area, out status);
-                     if(pos != null && status == GeoCoderStatusCode.G_GEO_SUCCESS)
+                     if (pos != null && status == GeoCoderStatusCode.G_GEO_SUCCESS)
                      {
                         objects.Add(new PointAndInfo(pos.Value, area));
                      }
@@ -152,7 +159,7 @@ namespace Demo.WindowsPresentation
                   {
                      string area = "Pilaite";
                      PointLatLng? pos = GMapProviders.GoogleMap.GetPoint("Lithuania, Vilnius, " + area, out status);
-                     if(pos != null && status == GeoCoderStatusCode.G_GEO_SUCCESS)
+                     if (pos != null && status == GeoCoderStatusCode.G_GEO_SUCCESS)
                      {
                         objects.Add(new PointAndInfo(pos.Value, area));
                      }
@@ -162,7 +169,7 @@ namespace Demo.WindowsPresentation
                #endregion
             }
 
-            if(MainMap.Markers.Count > 1)
+            if (MainMap.Markers.Count > 1)
             {
                MainMap.ZoomAndCenterMarkers(null);
             }
@@ -205,7 +212,7 @@ namespace Demo.WindowsPresentation
          RenderTargetBitmap bmp = new RenderTargetBitmap((int)size.Width, (int)size.Height, 96, 96, PixelFormats.Pbgra32);
          bmp.Render(obj);
 
-         if(bmp.CanFreeze)
+         if (bmp.CanFreeze)
          {
             bmp.Freeze();
          }
@@ -250,7 +257,7 @@ namespace Demo.WindowsPresentation
          }
          MainMap.Markers.Add(m);
 
-         if(tt >= 333)
+         if (tt >= 333)
          {
             timer.Stop();
             tt = 0;
@@ -285,15 +292,15 @@ namespace Demo.WindowsPresentation
 
       void transport_ProgressChanged(object sender, ProgressChangedEventArgs e)
       {
-         using(Dispatcher.DisableProcessing())
+         using (Dispatcher.DisableProcessing())
          {
-            lock(trolleybus)
+            lock (trolleybus)
             {
-               foreach(VehicleData d in trolleybus)
+               foreach (VehicleData d in trolleybus)
                {
                   GMapMarker marker;
 
-                  if(!trolleybusMarkers.TryGetValue(d.Id, out marker))
+                  if (!trolleybusMarkers.TryGetValue(d.Id, out marker))
                   {
                      marker = new GMapMarker(new PointLatLng(d.Lat, d.Lng));
                      marker.Tag = d.Id;
@@ -311,7 +318,7 @@ namespace Demo.WindowsPresentation
                         shape.Angle = d.Bearing;
                         shape.Tooltip.SetValues("TrolleyBus", d);
 
-                        if(shape.IsChanged)
+                        if (shape.IsChanged)
                         {
                            shape.UpdateVisual(false);
                         }
@@ -320,13 +327,13 @@ namespace Demo.WindowsPresentation
                }
             }
 
-            lock(bus)
+            lock (bus)
             {
-               foreach(VehicleData d in bus)
+               foreach (VehicleData d in bus)
                {
                   GMapMarker marker;
 
-                  if(!busMarkers.TryGetValue(d.Id, out marker))
+                  if (!busMarkers.TryGetValue(d.Id, out marker))
                   {
                      marker = new GMapMarker(new PointLatLng(d.Lat, d.Lng));
                      marker.Tag = d.Id;
@@ -349,7 +356,7 @@ namespace Demo.WindowsPresentation
                         shape.Angle = d.Bearing;
                         shape.Tooltip.SetValues("Bus", d);
 
-                        if(shape.IsChanged)
+                        if (shape.IsChanged)
                         {
                            shape.UpdateVisual(false);
                         }
@@ -358,7 +365,7 @@ namespace Demo.WindowsPresentation
                }
             }
 
-            if(firstLoadTrasport)
+            if (firstLoadTrasport)
             {
                firstLoadTrasport = false;
             }
@@ -367,23 +374,23 @@ namespace Demo.WindowsPresentation
 
       void transport_DoWork(object sender, DoWorkEventArgs e)
       {
-         while(!transport.CancellationPending)
+         while (!transport.CancellationPending)
          {
             try
             {
-               lock(trolleybus)
+               lock (trolleybus)
                {
                   Stuff.GetVilniusTransportData(Demo.WindowsForms.TransportType.TrolleyBus, string.Empty, trolleybus);
                }
 
-               lock(bus)
+               lock (bus)
                {
                   Stuff.GetVilniusTransportData(Demo.WindowsForms.TransportType.Bus, string.Empty, bus);
                }
 
                transport.ReportProgress(100);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                Debug.WriteLine("transport_DoWork: " + ex.ToString());
             }
@@ -405,14 +412,14 @@ namespace Demo.WindowsPresentation
                                 Obj = p,
                                 Dist = MainMap.MapProvider.Projection.GetDistance(center, p.Point)
                              };
-         if(objectsInArea.Any())
+         if (objectsInArea.Any())
          {
             var maxDistObject = (from p in objectsInArea
                                  orderby p.Dist descending
                                  select p).First();
 
             // add objects to zone
-            foreach(var o in objectsInArea)
+            foreach (var o in objectsInArea)
             {
                GMapMarker it = new GMapMarker(o.Obj.Point);
                {
@@ -470,15 +477,19 @@ namespace Demo.WindowsPresentation
       {
          System.Windows.Point p = e.GetPosition(MainMap);
          currentMarker.Position = MainMap.FromLocalToLatLng((int)p.X, (int)p.Y);
+         textBoxLng2.Text = currentMarker.Position.Lng.ToString();
+         textBoxLat2.Text = currentMarker.Position.Lat.ToString();
       }
 
       // move current marker with left holding
       void MainMap_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
       {
-         if(e.LeftButton == System.Windows.Input.MouseButtonState.Pressed)
+         if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed)
          {
             System.Windows.Point p = e.GetPosition(MainMap);
             currentMarker.Position = MainMap.FromLocalToLatLng((int)p.X, (int)p.Y);
+            textBoxLng2.Text = currentMarker.Position.Lng.ToString();
+            textBoxLat2.Text = currentMarker.Position.Lat.ToString();
          }
       }
 
@@ -504,7 +515,7 @@ namespace Demo.WindowsPresentation
       // tile louading starts
       void MainMap_OnTileLoadStart()
       {
-         System.Windows.Forms.MethodInvoker m = delegate()
+         System.Windows.Forms.MethodInvoker m = delegate ()
          {
             progressBar1.Visibility = Visibility.Visible;
          };
@@ -523,7 +534,7 @@ namespace Demo.WindowsPresentation
       {
          MainMap.ElapsedMilliseconds = ElapsedMilliseconds;
 
-         System.Windows.Forms.MethodInvoker m = delegate()
+         System.Windows.Forms.MethodInvoker m = delegate ()
          {
             progressBar1.Visibility = Visibility.Hidden;
             groupBox3.Header = "loading, last in " + MainMap.ElapsedMilliseconds + "ms";
@@ -553,7 +564,7 @@ namespace Demo.WindowsPresentation
       // enable current marker
       private void checkBoxCurrentMarker_Checked(object sender, RoutedEventArgs e)
       {
-         if(currentMarker != null)
+         if (currentMarker != null)
          {
             MainMap.Markers.Add(currentMarker);
          }
@@ -562,7 +573,7 @@ namespace Demo.WindowsPresentation
       // disable current marker
       private void checkBoxCurrentMarker_Unchecked(object sender, RoutedEventArgs e)
       {
-         if(currentMarker != null)
+         if (currentMarker != null)
          {
             MainMap.Markers.Remove(currentMarker);
          }
@@ -590,7 +601,7 @@ namespace Demo.WindowsPresentation
 
             MainMap.Position = new PointLatLng(lat, lng);
          }
-         catch(Exception ex)
+         catch (Exception ex)
          {
             MessageBox.Show("incorrect coordinate format: " + ex.Message);
          }
@@ -599,10 +610,10 @@ namespace Demo.WindowsPresentation
       // goto by geocoder
       private void textBoxGeo_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
       {
-         if(e.Key == System.Windows.Input.Key.Enter)
+         if (e.Key == System.Windows.Input.Key.Enter)
          {
             GeoCoderStatusCode status = MainMap.SetPositionByKeywords(textBoxGeo.Text);
-            if(status != GeoCoderStatusCode.G_GEO_SUCCESS)
+            if (status != GeoCoderStatusCode.G_GEO_SUCCESS)
             {
                MessageBox.Show("Geocoder can't find: '" + textBoxGeo.Text + "', reason: " + status.ToString(), "GMap.NET", MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
@@ -617,7 +628,7 @@ namespace Demo.WindowsPresentation
       private void sliderZoom_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
       {
          // updates circles on map
-         foreach(var c in Circles)
+         foreach (var c in Circles)
          {
             UpdateCircle(c.Shape as Circle);
          }
@@ -639,24 +650,24 @@ namespace Demo.WindowsPresentation
       private void button3_Click(object sender, RoutedEventArgs e)
       {
          RectLatLng area = MainMap.SelectedArea;
-         if(!area.IsEmpty)
+         if (!area.IsEmpty)
          {
-            for(int i = (int)MainMap.Zoom; i <= MainMap.MaxZoom; i++)
+            for (int i = (int)MainMap.Zoom; i <= MainMap.MaxZoom; i++)
             {
                MessageBoxResult res = MessageBox.Show("Ready ripp at Zoom = " + i + " ?", "GMap.NET", MessageBoxButton.YesNoCancel);
 
-               if(res == MessageBoxResult.Yes)
+               if (res == MessageBoxResult.Yes)
                {
                   TilePrefetcher obj = new TilePrefetcher();
                   obj.Owner = this;
                   obj.ShowCompleteMessage = true;
                   obj.Start(area, i, MainMap.MapProvider, 100);
                }
-               else if(res == MessageBoxResult.No)
+               else if (res == MessageBoxResult.No)
                {
                   continue;
                }
-               else if(res == MessageBoxResult.Cancel)
+               else if (res == MessageBoxResult.Cancel)
                {
                   break;
                }
@@ -678,14 +689,14 @@ namespace Demo.WindowsPresentation
       // clear cache
       private void button4_Click(object sender, RoutedEventArgs e)
       {
-         if(MessageBox.Show("Are You sure?", "Clear GMap.NET cache?", MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
+         if (MessageBox.Show("Are You sure?", "Clear GMap.NET cache?", MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
          {
             try
             {
                MainMap.Manager.PrimaryCache.DeleteOlderThan(DateTime.Now, null);
                MessageBox.Show("Done. Cache is clear.");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                MessageBox.Show(ex.Message);
             }
@@ -737,18 +748,18 @@ namespace Demo.WindowsPresentation
             bool? result = dlg.ShowDialog();
 
             // Process save file dialog box results
-            if(result == true)
+            if (result == true)
             {
                // Save document
                string filename = dlg.FileName;
 
-               using(System.IO.Stream st = System.IO.File.OpenWrite(filename))
+               using (System.IO.Stream st = System.IO.File.OpenWrite(filename))
                {
                   en.Save(st);
                }
             }
          }
-         catch(Exception ex)
+         catch (Exception ex)
          {
             MessageBox.Show(ex.Message);
          }
@@ -758,19 +769,19 @@ namespace Demo.WindowsPresentation
       private void button10_Click(object sender, RoutedEventArgs e)
       {
          var clear = MainMap.Markers.Where(p => p != null && p != currentMarker);
-         if(clear != null)
+         if (clear != null)
          {
-            for(int i = 0; i < clear.Count(); i++)
+            for (int i = 0; i < clear.Count(); i++)
             {
                MainMap.Markers.Remove(clear.ElementAt(i));
                i--;
             }
          }
 
-         if(radioButtonPerformance.IsChecked == true)
+         if (radioButtonPerformance.IsChecked == true)
          {
             tt = 0;
-            if(!timer.IsEnabled)
+            if (!timer.IsEnabled)
             {
                timer.Start();
             }
@@ -780,27 +791,34 @@ namespace Demo.WindowsPresentation
       // add marker
       private void button8_Click(object sender, RoutedEventArgs e)
       {
-         GMapMarker m = new GMapMarker(currentMarker.Position);
+         //currentMarker.Position = new PointLatLng() { Lat = 113.957057, Lng = 22.560476 };
+
+         double lat = double.Parse(textBoxLat.Text, CultureInfo.InvariantCulture);
+         double lng = double.Parse(textBoxLng.Text, CultureInfo.InvariantCulture);
+
+         MainMap.Position = new PointLatLng(lat, lng);
+
+         GMapMarker m = new GMapMarker(MainMap.Position);
          {
             Placemark? p = null;
-            if(checkBoxPlace.IsChecked.Value)
+            if (checkBoxPlace.IsChecked.Value)
             {
                GeoCoderStatusCode status;
-               var plret = GMapProviders.GoogleMap.GetPlacemark(currentMarker.Position, out status);
-               if(status == GeoCoderStatusCode.G_GEO_SUCCESS && plret != null)
+               var plret = GMapProviders.GoogleMap.GetPlacemark(MainMap.Position, out status);
+               if (status == GeoCoderStatusCode.G_GEO_SUCCESS && plret != null)
                {
                   p = plret;
                }
             }
 
             string ToolTipText;
-            if(p != null)
+            if (p != null)
             {
                ToolTipText = p.Value.Address;
             }
             else
             {
-               ToolTipText = currentMarker.Position.ToString();
+               ToolTipText = MainMap.Position.ToString();
             }
 
             m.Shape = new CustomMarkerDemo(this, m, ToolTipText);
@@ -825,13 +843,13 @@ namespace Demo.WindowsPresentation
       private void button12_Click(object sender, RoutedEventArgs e)
       {
          RoutingProvider rp = MainMap.MapProvider as RoutingProvider;
-         if(rp == null)
+         if (rp == null)
          {
             rp = GMapProviders.OpenStreetMap; // use OpenStreetMap if provider does not implement routing
          }
 
          MapRoute route = rp.GetRoute(start, end, false, false, (int)MainMap.Zoom);
-         if(route != null)
+         if (route != null)
          {
             GMapMarker m1 = new GMapMarker(start);
             m1.Shape = new CustomMarkerDemo(this, m1, "Start: " + route.Name);
@@ -868,29 +886,29 @@ namespace Demo.WindowsPresentation
       {
          int offset = 22;
 
-         if(MainMap.IsFocused)
+         if (MainMap.IsFocused)
          {
-            if(e.Key == Key.Left)
+            if (e.Key == Key.Left)
             {
                MainMap.Offset(-offset, 0);
             }
-            else if(e.Key == Key.Right)
+            else if (e.Key == Key.Right)
             {
                MainMap.Offset(offset, 0);
             }
-            else if(e.Key == Key.Up)
+            else if (e.Key == Key.Up)
             {
                MainMap.Offset(0, -offset);
             }
-            else if(e.Key == Key.Down)
+            else if (e.Key == Key.Down)
             {
                MainMap.Offset(0, offset);
             }
-            else if(e.Key == Key.Add)
+            else if (e.Key == Key.Add)
             {
                czuZoomUp_Click(null, null);
             }
-            else if(e.Key == Key.Subtract)
+            else if (e.Key == Key.Subtract)
             {
                czuZoomDown_Click(null, null);
             }
@@ -903,7 +921,7 @@ namespace Demo.WindowsPresentation
          MainMap.Markers.Clear();
 
          // start performance test
-         if(radioButtonPerformance.IsChecked == true)
+         if (radioButtonPerformance.IsChecked == true)
          {
             timer.Start();
          }
@@ -914,9 +932,9 @@ namespace Demo.WindowsPresentation
          }
 
          // start realtime transport tracking demo
-         if(radioButtonTransport.IsChecked == true)
+         if (radioButtonTransport.IsChecked == true)
          {
-            if(!transport.IsBusy)
+            if (!transport.IsBusy)
             {
                firstLoadTrasport = true;
                transport.RunWorkerAsync();
@@ -924,7 +942,7 @@ namespace Demo.WindowsPresentation
          }
          else
          {
-            if(transport.IsBusy)
+            if (transport.IsBusy)
             {
                transport.CancelAsync();
             }
@@ -933,14 +951,14 @@ namespace Demo.WindowsPresentation
 
       private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
       {
-         if(e.Key == Key.A)
-         {
-            MainMap.Bearing--;
-         }
-         else if(e.Key == Key.Z)
-         {
-            MainMap.Bearing++;
-         }
+         //if (e.Key == Key.A)
+         //{
+         //   MainMap.Bearing--;
+         //}
+         //else if (e.Key == Key.Z)
+         //{
+         //   MainMap.Bearing++;
+         //}
       }
    }
 
@@ -951,11 +969,11 @@ namespace Demo.WindowsPresentation
 
       public override ValidationResult Validate(object value, CultureInfo cultureInfo)
       {
-         if(!(value is OpenStreetMapProviderBase))
+         if (!(value is OpenStreetMapProviderBase))
          {
-            if(!UserAcceptedLicenseOnce)
+            if (!UserAcceptedLicenseOnce)
             {
-               if(File.Exists(AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + "License.txt"))
+               if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + "License.txt"))
                {
                   string ctn = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + "License.txt");
                   int li = ctn.IndexOf("License");
@@ -964,10 +982,10 @@ namespace Demo.WindowsPresentation
                   var d = new Demo.WindowsPresentation.Windows.Message();
                   d.richTextBox1.Text = txt;
 
-                  if(true == d.ShowDialog())
+                  if (true == d.ShowDialog())
                   {
                      UserAcceptedLicenseOnce = true;
-                     if(Window != null)
+                     if (Window != null)
                      {
                         Window.Title += " - license accepted by " + Environment.UserName + " at " + DateTime.Now;
                      }
@@ -980,7 +998,7 @@ namespace Demo.WindowsPresentation
                }
             }
 
-            if(!UserAcceptedLicenseOnce)
+            if (!UserAcceptedLicenseOnce)
             {
                return new ValidationResult(false, "user do not accepted license ;/");
             }
